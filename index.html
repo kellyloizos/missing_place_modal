@@ -6,6 +6,8 @@
     <title>Suggest a Missing Place</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Leaflet.js CSS for OpenStreetMap -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -24,6 +26,12 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
+        /* Set a specific height for the map container */
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 0.5rem; /* rounded-lg */
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -39,7 +47,7 @@
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col transform transition-all duration-300 scale-95 opacity-0" id="modal-content">
             
             <!-- Modal Header -->
-            <div class="flex justify-between items-center p-5 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl">
+            <div class="flex justify-between items-center p-5 border-b border-gray-200 sticky top-0 bg-white rounded-t-2xl z-10">
                 <h2 class="text-2xl font-bold text-gray-800">Suggest a Missing Place</h2>
                 <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -73,18 +81,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Map & Pin -->
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">Location</label>
-                        <div class="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
-                            <!-- Placeholder for a map library like Google Maps or Leaflet -->
-                            <img src="https://placehold.co/600x400/e2e8f0/4a5568?text=Map+Goes+Here" class="w-full h-full object-cover" alt="Map placeholder">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <svg class="w-10 h-10 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                            </div>
+                        <label class="block text-sm font-medium text-gray-700">Location (Drag the pin to adjust)</label>
+                        <div class="w-full h-64 bg-gray-200 rounded-lg overflow-hidden relative">
+                            <!-- OpenStreetMap container -->
+                            <div id="map"></div>
                         </div>
-                        <button class="w-full bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 transition flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            Adjust Pin on Map
-                        </button>
                     </div>
                     <!-- Address & Coords -->
                     <div class="space-y-4">
@@ -137,6 +138,8 @@
         </div>
     </div>
 
+    <!-- Leaflet.js script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Modal elements
@@ -146,12 +149,64 @@
             const closeModalBtn = document.getElementById('closeModalBtn');
             const cancelBtn = document.getElementById('cancelBtn');
 
+            // Form elements
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+
             // Hours elements
             const hoursContainer = document.getElementById('hours-container');
             const addDayBtn = document.getElementById('addDayBtn');
 
-            const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            let availableDays = [...daysOfWeek];
+            // Map variables
+            let map;
+            let marker;
+            const initialCoords = [40.7128, -74.0060]; // Default: New York City
+
+            // --- Map Initialization ---
+            const initMap = () => {
+                // Check if map is already initialized
+                if (map) return;
+                
+                // Initialize map centered on New York City
+                map = L.map('map').setView(initialCoords, 13);
+
+                // Add OpenStreetMap tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                // Add a draggable marker
+                marker = L.marker(initialCoords, {
+                    draggable: true
+                }).addTo(map);
+
+                // Set initial input values
+                latInput.value = initialCoords[0].toFixed(6);
+                lngInput.value = initialCoords[1].toFixed(6);
+
+                // Event listener for when the marker is dragged
+                marker.on('dragend', function(event) {
+                    const position = marker.getLatLng();
+                    latInput.value = position.lat.toFixed(6);
+                    lngInput.value = position.lng.toFixed(6);
+                    map.panTo(position);
+                });
+            };
+            
+            // --- Coordinate Input Sync ---
+            const updateMarkerFromInputs = () => {
+                const lat = parseFloat(latInput.value);
+                const lng = parseFloat(lngInput.value);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    const newLatLng = L.latLng(lat, lng);
+                    marker.setLatLng(newLatLng);
+                    map.setView(newLatLng);
+                }
+            };
+            
+            latInput.addEventListener('change', updateMarkerFromInputs);
+            lngInput.addEventListener('change', updateMarkerFromInputs);
 
             // Function to show the modal
             const openModal = () => {
@@ -160,7 +215,16 @@
                 setTimeout(() => {
                     modalContent.classList.remove('scale-95', 'opacity-0');
                     modalContent.classList.add('scale-100', 'opacity-100');
-                }, 10); // small delay for transition
+                    
+                    // Initialize map and then invalidate its size to ensure it renders correctly
+                    if (!map) {
+                       initMap();
+                    }
+                    setTimeout(() => {
+                        map.invalidateSize();
+                    }, 10);
+
+                }, 10);
             };
 
             // Function to hide the modal
@@ -170,7 +234,7 @@
                 setTimeout(() => {
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
-                }, 300); // match transition duration
+                }, 300);
             };
             
             // Event listeners for modal controls
@@ -183,13 +247,14 @@
                 }
             });
 
-            // --- Operating Hours Logic ---
+            // --- Operating Hours Logic (unchanged) ---
+            const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            let availableDays = [...daysOfWeek];
 
             const createDaySelector = (selectedDay) => {
                 const select = document.createElement('select');
                 select.className = 'day-select w-full md:w-1/3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition bg-white';
                 
-                // Add currently selected day if it's not in the available list
                 if (selectedDay && !availableDays.includes(selectedDay)) {
                     const option = document.createElement('option');
                     option.value = selectedDay;
@@ -198,7 +263,6 @@
                     select.appendChild(option);
                 }
 
-                // Add all available days
                 availableDays.forEach(day => {
                     const option = document.createElement('option');
                     option.value = day;
@@ -215,63 +279,38 @@
                     addDayBtn.style.display = 'none';
                     return;
                 }
-
                 const initialDay = day || availableDays[0];
-                
                 const row = document.createElement('div');
                 row.className = 'day-row flex flex-col md:flex-row items-center gap-3 bg-white p-3 rounded-lg border';
-
-                // Day selector
                 const daySelect = createDaySelector(initialDay);
-                
-                // Time inputs
                 const timeWrapper = document.createElement('div');
                 timeWrapper.className = 'flex items-center gap-2 flex-grow w-full md:w-auto';
-                timeWrapper.innerHTML = `
-                    <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
-                    <span class="text-gray-500">-</span>
-                    <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
-                `;
-
-                // Remove button
+                timeWrapper.innerHTML = `<input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"> <span class="text-gray-500">-</span> <input type="time" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">`;
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'text-gray-400 hover:text-red-500 transition';
                 removeBtn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-                
                 removeBtn.onclick = () => {
                     hoursContainer.removeChild(row);
                     updateAvailableDays();
                 };
-
                 row.appendChild(daySelect);
                 row.appendChild(timeWrapper);
                 row.appendChild(removeBtn);
-                
                 hoursContainer.appendChild(row);
-
                 updateAvailableDays();
             };
 
             const updateAvailableDays = () => {
                 const selectedDays = [...document.querySelectorAll('.day-select')].map(s => s.value);
                 availableDays = daysOfWeek.filter(d => !selectedDays.includes(d));
-
-                // Re-render all dropdowns to show updated availability
                 document.querySelectorAll('.day-select').forEach(select => {
                     const currentValue = select.value;
-                    // Clear existing options except the placeholder
-                    while (select.firstChild) {
-                        select.removeChild(select.firstChild);
-                    }
-                    
-                    // Add the currently selected value back first
+                    while (select.firstChild) { select.removeChild(select.firstChild); }
                     const currentOption = document.createElement('option');
                     currentOption.value = currentValue;
                     currentOption.textContent = currentValue;
                     currentOption.selected = true;
                     select.appendChild(currentOption);
-
-                    // Add the other available days
                     availableDays.forEach(day => {
                        const option = document.createElement('option');
                        option.value = day;
@@ -279,20 +318,12 @@
                        select.appendChild(option);
                     });
                 });
-                
-                if (availableDays.length > 0) {
-                    addDayBtn.style.display = 'block';
-                } else {
-                    addDayBtn.style.display = 'none';
-                }
+                addDayBtn.style.display = availableDays.length > 0 ? 'block' : 'none';
             };
             
             addDayBtn.addEventListener('click', () => addHoursRow());
-
-            // Add the first hours row by default
             addHoursRow();
         });
     </script>
-
 </body>
 </html>
