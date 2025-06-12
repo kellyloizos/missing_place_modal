@@ -60,7 +60,7 @@
                 <!-- Place Name -->
                 <div>
                     <label for="placeName" class="block text-sm font-medium text-gray-700 mb-1">Place Name</label>
-                    <input type="text" id="placeName" placeholder="e.g., The Corner Cafe" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+                    <input type="text" id="placeName" placeholder="Love's #404" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
                 </div>
 
                 <!-- Category -->
@@ -68,12 +68,14 @@
                     <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                     <select id="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition bg-white">
                         <option>Select a category</option>
-                        <option>Restaurant</option>
-                        <option>Coffee Shop</option>
-                        <option>Park</option>
-                        <option>Museum</option>
-                        <option>Store</option>
-                        <option>Other</option>
+                        <option>Truck Stop</option>
+                        <option>Rest Area</option>
+                        <option>Manufacturing Plant</option>
+                        <option>Distribution Center</option>
+                        <option>Retail</option>
+                        <option>Weigh Station</option>
+                        <option>Cat Scale</option>
+                        <option>LCV Lot</option>
                     </select>
                 </div>
 
@@ -91,16 +93,16 @@
                     <div class="space-y-4">
                         <div>
                             <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address (Optional)</label>
-                            <textarea id="address" placeholder="123 Main Street, Anytown, USA 12345" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"></textarea>
+                            <textarea id="address" placeholder="2008 Highway 206 South, Bordentown, NJ 08505" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"></textarea>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label for="latitude" class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
-                                <input type="text" id="latitude" placeholder="40.7128" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+                                <input type="text" id="latitude" placeholder="40.119923" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
                             </div>
                             <div>
                                 <label for="longitude" class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
-                                <input type="text" id="longitude" placeholder="-74.0060" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+                                <input type="text" id="longitude" placeholder="-74.708155" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
                             </div>
                         </div>
                     </div>
@@ -110,11 +112,77 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number (Optional)</label>
-                        <input type="tel" id="phone" placeholder="(123) 456-7890" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+                        <input type="tel" id="phone" placeholder="609-324-1005" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
                     </div>
                     <div>
                         <label for="website" class="block text-sm font-medium text-gray-700 mb-1">Website (Optional)</label>
-                        <input type="url" id="website" placeholder="https://example.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+                        <input type="url" id="website" placeholder="https://www.loves.com/locations/404" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                </div>
+
+                <!-- Amenities Section -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Amenities (Optional)</label>
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div class="flex items-center">
+                                <input id="amenity-restrooms" name="amenities" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="amenity-restrooms" class="ml-2 block text-sm text-gray-900">Restrooms</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="amenity-showers" name="amenities" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="amenity-showers" class="ml-2 block text-sm text-gray-900">Showers</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="amenity-restaurant" name="amenities" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="amenity-restaurant" class="ml-2 block text-sm text-gray-900">Restaurant</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="amenity-laundry" name="amenities" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="amenity-laundry" class="ml-2 block text-sm text-gray-900">Laundry</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="amenity-wifi" name="amenities" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="amenity-wifi" class="ml-2 block text-sm text-gray-900">Wifi</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="amenity-atm" name="amenities" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="amenity-atm" class="ml-2 block text-sm text-gray-900">ATM</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Truck Repair Services Section -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Truck Repair Services (Optional)</label>
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div class="flex items-center">
+                                <input id="service-body-repair" name="services" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="service-body-repair" class="ml-2 block text-sm text-gray-900">Body Repair</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="service-engine-repair" name="services" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="service-engine-repair" class="ml-2 block text-sm text-gray-900">Engine Repair</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="service-tires" name="services" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="service-tires" class="ml-2 block text-sm text-gray-900">Tires</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="service-glass-repair" name="services" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="service-glass-repair" class="ml-2 block text-sm text-gray-900">Glass Repair</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="service-frame-alignment" name="services" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="service-frame-alignment" class="ml-2 block text-sm text-gray-900">Frame & Alignment</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input id="service-hydraulic" name="services" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <label for="service-hydraulic" class="ml-2 block text-sm text-gray-900">Hydraulic Services</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -160,15 +228,16 @@
             // Map variables
             let map;
             let marker;
-            const initialCoords = [40.7128, -74.0060]; // Default: New York City
+            // Updated coordinates for Bordentown, NJ
+            const initialCoords = [40.119923, -74.708155]; 
 
             // --- Map Initialization ---
             const initMap = () => {
                 // Check if map is already initialized
                 if (map) return;
                 
-                // Initialize map centered on New York City
-                map = L.map('map').setView(initialCoords, 13);
+                // Initialize map centered on the new location
+                map = L.map('map').setView(initialCoords, 15); // Zoomed in a bit more
 
                 // Add OpenStreetMap tile layer
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -176,12 +245,12 @@
                     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 }).addTo(map);
 
-                // Add a draggable marker
+                // Add a draggable marker at the new location
                 marker = L.marker(initialCoords, {
                     draggable: true
                 }).addTo(map);
 
-                // Set initial input values
+                // Set initial input values from the new coordinates
                 latInput.value = initialCoords[0].toFixed(6);
                 lngInput.value = initialCoords[1].toFixed(6);
 
